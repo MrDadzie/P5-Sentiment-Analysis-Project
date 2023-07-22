@@ -1,4 +1,7 @@
 # P5 - Sentiment Analysis (Text Classification)
+
+![Sample Image](images.png)<br>
+
 *In this project, the concept of transfer learning was employed to fine tune novel Text Classifier models hosted on hugging faces (Xlnet-Bert-Cased, cardiffnlp/twitter-xlm-roberta-base-sentiment and bert-base-uncased). The fine tuned model was pushed unto hugging faces and used to build an interactive application using streamlit. 
 
 ## Summary
