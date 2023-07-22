@@ -14,7 +14,7 @@
 The project was completed in four main phases: 
 
 * ### Setting Up Project Repository<br>
-  Here, all components of the project repository was set. The main folders included ML asset and src  folders. The dataset for the ML training was also uploaded<br>
+  Here, all components of the project repository was set. The repository was initialized and folder(with acompanying files) were uploaded. The dataset used for fine tuning the models training was also uploaded<br>
 
 * ### Installing Dependencies <br>
    All project dependecies were installed(pandas, numpy. streamlit, torch,transformers and scikit-learn)
