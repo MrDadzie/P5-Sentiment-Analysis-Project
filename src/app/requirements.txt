@@ -1,6 +1,5 @@
 pandas
 transformers
 streamlit
-pytorch
-
+torch
 
