@@ -1,44 +1,23 @@
 import streamlit as st
-import transformers
-# import torch
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+import numpy as np
+from scipy.special import softmax
 
-# Load the model and tokenizer
-model = transformers.AutoModel.from_pretrained("MrDdz/mytuned_test_trainer-base-cased1")
-tokenizer = transformers.AutoTokenizer.from_pretrained("MrDdz/mytuned_test_trainer-base-cased1")
-
-# Define the function for sentiment analysis
-@st.cache_resource
-def predict_sentiment(text):
-    # Load the pipeline.
-    pipeline = transformers.pipeline("sentiment-analysis")
-
-    # Predict the sentiment.
-    prediction = pipeline(text)
-    sentiment = prediction[0]["label"]
-    score = prediction[0]["score"]
-
-    return sentiment, score
-
-# Setting the page configurations
-st.set_page_config(
-    page_title="Sentiment Analysis App",
-    page_icon=":smile:",
-    layout="wide",
-    initial_sidebar_state="auto",
-)
 
 # Add description and title
 st.write("""
-# Predict if your text is  Positive, Negative or Nuetral ...
-Please type your text and press ENTER key to know if your text is positive, negative, or neutral sentiment!
+# Sentiment Analysis App
 """)
 
 
 # Add image
-image = st.image("https://medium.com/scrapehero/sentiment-analysis-using-svm-338d418e3ff1", width=400)
+image = st.image("images.png", width=200)
+
 
 # Get user input
 text = st.text_input("Type here:")
+button = st.button('Analyze')
 
 # Define the CSS style for the app
 st.markdown(
@@ -55,12 +34,30 @@ h1 {
 unsafe_allow_html=True
 )
 
-# Show sentiment output
-if text:
-    sentiment, score = predict_sentiment(text)
-    if sentiment == "Positive":
-        st.success(f"The sentiment is {sentiment} with a score of {score*100:.2f}%!")
-    elif sentiment == "Negative":
-        st.error(f"The sentiment is {sentiment} with a score of {score*100:.2f}%!")
-    else:
-        st.warning(f"The sentiment is {sentiment} with a score of {score*100:.2f}%!")
+
+def preprocess(text):
+    new_text = []
+    for t in text.split(" "):
+        t = '@user' if t.startswith('@') and len(t) > 1 else t
+        t = 'http' if t.startswith('http') else t
+        new_text.append(t)
+    return " ".join(new_text)
+
+@st.cache_resource()
+def get_model():
+   # Load the model and tokenizer
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+    model = AutoModelForSequenceClassification.from_pretrained("MrDdz/bert-base-uncased")
+    return tokenizer,model
+tokenizer, model = get_model()
+
+if  button:
+    text_sample = tokenizer(text, padding = 'max_length',return_tensors = 'pt')
+    # print(text_sample)
+    output = model(**text_sample)
+    scores_ = output[0][0].detach().numpy()
+    scores_ = softmax(scores_)
+
+    labels = ['Negative','Neutral','Positive']
+    scores = {l:float(s) for (l,s) in zip(labels,scores_)}
+    st.write("Prediction :",scores)
